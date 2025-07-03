@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  # Base de données PostgreSQL
+  postgres:
+    image: postgres:15
+    container_name: micrommerce-postgres
+    environment:
+      POSTGRES_DB: micrommerce
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: votre_mot_de_passe
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - micrommerce-network
+
+  # Application Spring Boot
+  micrommerce-app:
+    build: .
+    container_name: micrommerce-app
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/micrommerce
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: votre_mot_de_passe
+    depends_on:
+      - postgres
+    networks:
+      - micrommerce-network
+
+volumes:
+  postgres_data:
+
+networks:
+  micrommerce-network:
+    driver: bridge
